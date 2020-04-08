@@ -41,7 +41,7 @@ python_to_ros_type_map = {
     'bool'    : ['bool'],
     'int'     : ['int8', 'byte', 'uint8', 'char',
                  'int16', 'uint16', 'int32', 'uint32',
-                 'int64', 'uint64', 'float32', 'float64'],
+                 'int64', 'uint64'],
     'float'   : ['float32', 'float64'],
     'str'     : ['string'],
     'unicode' : ['string'],
@@ -146,6 +146,17 @@ def _convert_to_ros_time(field_type, field_value):
     return time
 
 def _convert_to_ros_primitive(field_type, field_value):
+    if field_value == None:
+        if field_type in python_to_ros_type_map['bool']:
+            return False
+        if field_type in python_to_ros_type_map['int']:
+            return int(2**32-1)
+        if field_type in python_to_ros_type_map['float']:
+            return float('nan')
+        if field_type in python_to_ros_type_map['str'] + python_to_ros_type_map['unicode']:
+            return str(None).encode('utf-8')
+        if field_type in python_to_ros_type_map['long']:
+            return long(0)
     if field_type == "string":
         field_value = field_value.encode('utf-8')
     return field_value
