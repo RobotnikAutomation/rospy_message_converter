@@ -170,7 +170,7 @@ def _convert_to_ros_type(field_name, field_type, field_value, check_types=True):
     elif _is_field_type_an_array(field_type):
         field_value = _convert_to_ros_array(field_name, field_type, field_value, check_types)
     else:
-        field_value = convert_dictionary_to_ros_message(field_type, field_value)
+        field_value = convert_dictionary_to_ros_message(field_type, field_value, check_types=check_types)
 
     return field_value
 
@@ -208,6 +208,11 @@ def _convert_to_ros_time(field_type, field_value):
 
 def _convert_to_ros_primitive(field_type, field_value):
     # std_msgs/msg/_String.py always calls encode() on python3, so don't do it here
+
+    if field_value == None:
+        if field_type in ros_to_python_type_map:
+            return ros_to_python_type_map[field_type][0]()
+
     if field_type == "string" and not python3:
         field_value = field_value.encode('utf-8')
     return field_value
